@@ -1,16 +1,16 @@
 // The 'puzzlers_voting_aleo' program.
-program puzzlers_voting_aleo_test_001.aleo {
+program puzzlers_voting_aleo_test_002.aleo {
     mapping proposals: field => address;
 
     record Proposal {
-        owner: address,
+        public owner: address,
         public votes_to_distribute: u8,
-        id: field,
+        public id: field,
         // last block when it could be voted; if you want unbounded proposal --- just set a high enough number
-        deadline: u32,
+        public deadline: u32,
         // TODO research if imported types can be used for voting on
-        count_y: u8,
-        count_n: u8
+        public count_y: u8,
+        public count_n: u8
     }
 
     record Voter {
@@ -22,7 +22,7 @@ program puzzlers_voting_aleo_test_001.aleo {
         public voters_count: u8,
         public id: field,
         public deadline: u32
-    ) -> public Proposal {
+    ) -> Proposal {
         return Proposal{
             owner: self.caller, votes_to_distribute: voters_count, id, deadline, count_y: 0u8, count_n: 0u8
         } then finalize(id, self.caller, deadline);
@@ -34,7 +34,7 @@ program puzzlers_voting_aleo_test_001.aleo {
 
     transition voter_add(
         voter: address, public proposal: Proposal
-    ) -> (public Proposal, Voter) {
+    ) -> (Proposal, Voter) {
         assert(proposal.owner == self.caller); //, "Only proposal owner can add voters");
         assert(proposal.votes_to_distribute > 0u8); //, "No more votes to distribute");
         return (
@@ -50,7 +50,7 @@ program puzzlers_voting_aleo_test_001.aleo {
         );
     }
 
-    transition vote_transition(vote_record: Voter, proposal: Proposal, choice_flag: u8) -> public Proposal {
+    transition vote_transition(vote_record: Voter, proposal: Proposal, choice_flag: u8) -> Proposal {
         assert(choice_flag <= 1u8); // `bool` tends to be more expensive in circuits
         assert(vote_record.proposal_id == proposal.id);// , "This `Voter` record is for another proposal");
         return Proposal{
