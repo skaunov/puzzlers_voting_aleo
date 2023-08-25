@@ -55,13 +55,15 @@ program puzzlers_voting_aleo_63.aleo {
         // assert(choice_flag <= 1u8); // If-then tends to be more expensive in circuits
         //      type casting helps here better
         assert(vote_record.proposal_id == proposal.id);// , "This `Voter` record is for another proposal");
+        let choice: u8 = 0u8;
+        if choice_flag {choice = 1u8;}
         return Proposal{
             owner: proposal.owner, 
             votes_to_distribute: proposal.votes_to_distribute, 
             id: proposal.id, 
             deadline: proposal.deadline,
-            count_y: proposal.count_y + (choice_flag as u8), 
-            count_n: proposal.count_n + (1u8 - (choice_flag as u8))
+            count_y: proposal.count_y + choice, 
+            count_n: proposal.count_n + (1u8 - choice)
         } then finalize(proposal.deadline);
     } finalize vote_transition(deadline: u32) {
         assert(block.height <= deadline);
