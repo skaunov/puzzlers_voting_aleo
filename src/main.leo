@@ -1,5 +1,5 @@
 // The 'puzzlers_voting_aleo' program.
-program puzzlers_voting_aleo_test_002.aleo {
+program puzzlers_voting_aleo_63.aleo {
     mapping proposals: field => address;
 
     record Proposal {
@@ -23,6 +23,7 @@ program puzzlers_voting_aleo_test_002.aleo {
         public id: field,
         public deadline: u32
     ) -> Proposal {
+        // assert(voters_count > 0u8);
         return Proposal{
             owner: self.caller, votes_to_distribute: voters_count, id, deadline, count_y: 0u8, count_n: 0u8
         } then finalize(id, self.caller, deadline);
@@ -50,18 +51,19 @@ program puzzlers_voting_aleo_test_002.aleo {
         );
     }
 
-    transition vote_transition(vote_record: Voter, proposal: Proposal, choice_flag: u8) -> Proposal {
-        assert(choice_flag <= 1u8); // `bool` tends to be more expensive in circuits
+    transition vote_transition(vote_record: Voter, proposal: Proposal, choice_flag: bool) -> Proposal {
+        // assert(choice_flag <= 1u8); // If-then tends to be more expensive in circuits
+        //      type casting helps here better
         assert(vote_record.proposal_id == proposal.id);// , "This `Voter` record is for another proposal");
         return Proposal{
             owner: proposal.owner, 
             votes_to_distribute: proposal.votes_to_distribute, 
             id: proposal.id, 
             deadline: proposal.deadline,
-            count_y: proposal.count_y + choice_flag, 
-            count_n: proposal.count_n + (1u8 - choice_flag)
+            count_y: proposal.count_y + (choice_flag as u8), 
+            count_n: proposal.count_n + (1u8 - (choice_flag as u8))
         } then finalize(proposal.deadline);
     } finalize vote_transition(deadline: u32) {
-        assert(block.height >= deadline);
+        assert(block.height <= deadline);
     }
 }

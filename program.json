@@ -1,6 +1,6 @@
 {
-    "program": "puzzlers_voting_aleo_test_002.aleo",
-    "version": "0.0.0",
-    "description": "",
+    "program": "puzzlers_voting_aleo_63.aleo",
+    "version": "0.1.0",
+    "description": "Onchain program for Puzzlers 2023 summer Voting project. Limited to 63 voters.",
     "license": "MIT"
 }
